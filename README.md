@@ -62,12 +62,6 @@ Once running, open your browser at:
 - `http://127.0.0.1:8000/` – root endpoint
 - `http://127.0.0.1:8000/docs` – interactive Swagger UI
 
-## Running tests
-
-This project uses `pytest` for testing.
-
-
-
 ## Project structure
 
 - `main.py` – FastAPI application and entry point
