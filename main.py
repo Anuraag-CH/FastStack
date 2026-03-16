@@ -6,6 +6,8 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException 
 from fastapi import status
+from schemas import PostCreate, PostResponse
+from datetime import datetime
 import uvicorn
 
 app = FastAPI()
@@ -18,13 +20,13 @@ posts = [
     "id": 1,
     "title": "FastAPI",
     "content": "FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+.",
-    "Date Posted": "March 15, 2026",
+    "date_posted": "March 15, 2026",
     },
     {
     "id": 2,
     "title": "Python    ",
     "content": "Python is a versatile programming language that is widely used for web development, data science, artificial intelligence, and more.",
-    "Date Posted": "March 15, 2026",
+    "date_posted": "March 15, 2026",
     },
 ]
 
@@ -43,10 +45,20 @@ def post_page(request: Request, post_id: int):
     
 
 
-@app.get("/api/posts")
+@app.get("/api/posts",response_model=list[PostResponse])
 def get_posts():
     return posts
 
+@app.post("/api/posts",response_model=PostResponse,status_code=status.HTTP_201_CREATED)
+def create_post(post: PostCreate):
+    new_post = {
+        "id": len(posts) + 1,
+        "title": post.title,
+        "content": post.content,
+        "date_posted": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    posts.append(new_post)
+    return new_post
 
 @app.get("/api/posts/{post_id}")
 def get_post(post_id: int):
