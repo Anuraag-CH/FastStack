@@ -1,20 +1,18 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+import mongoengine
+import os
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./blog.db"
+from dotenv import load_dotenv
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+load_dotenv()
 
 
-class Base(DeclarativeBase):
-    pass
+MONGODB_URL = os.getenv("MONGODB_URL")
+DB_NAME = os.getenv("DB_NAME")
 
 
-def get_db():
-    with SessionLocal() as db:
-        yield db
+def connect_db():
+    mongoengine.connect(host=MONGODB_URL, db=DB_NAME)
+
+
+def disconnect_db():
+    mongoengine.disconnect()

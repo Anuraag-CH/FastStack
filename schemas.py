@@ -15,9 +15,19 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: str
     image_file: str | None
     image_path: str
+
+    @classmethod
+    def from_mongo(cls, user) -> "UserResponse":
+        return cls(
+            id=str(user.id),
+            username=user.username,
+            email=user.email,
+            image_file=user.image_file,
+            image_path=user.image_path,
+        )
 
 
 class PostBase(BaseModel):
@@ -26,13 +36,24 @@ class PostBase(BaseModel):
 
 
 class PostCreate(PostBase):
-    user_id: int  # TEMPORARY
+    user_id: str  # TEMPORARY — MongoDB ObjectId string
 
 
 class PostResponse(PostBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    user_id: int
+    id: str
+    user_id: str
     date_posted: datetime
     author: UserResponse
+
+    @classmethod
+    def from_mongo(cls, post) -> "PostResponse":
+        return cls(
+            id=str(post.id),
+            title=post.title,
+            content=post.content,
+            user_id=str(post.user.id),
+            date_posted=post.date_posted,
+            author=UserResponse.from_mongo(post.user),
+        )

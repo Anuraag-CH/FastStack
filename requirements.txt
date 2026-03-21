@@ -1,3 +1,7 @@
 fastapi
 uvicorn
+mongoengine
+pymongo
+pydantic
 jinja2
+python-multipartcls
