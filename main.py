@@ -1,7 +1,7 @@
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, HTTPException, Request, status, Depends
+from fastapi.exceptions import RequestValidationError 
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,7 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 import models
 from database import connect_db
-from schemas import PostCreate, PostResponse, UserCreate, UserResponse
+from schemas import PostCreate, PostResponse, PostUpdate, UserCreate, UserResponse, UserUpdate
 
 connect_db()
 
@@ -135,6 +135,28 @@ def get_user_posts(user_id: str):
     return [PostResponse.from_mongo(p) for p in posts]
 
 
+@app.patch("/api/users/{user_id}", response_model=UserResponse)
+def patch_user(user_id: str, user_update: UserUpdate):
+    oid = to_object_id(user_id)
+    user = get_user_or_404(oid)
+    if user_update.username is not None:
+        user.username = user_update.username
+    if user_update.email is not None:
+        user.email = user_update.email
+    if user_update.image_file is not None:
+        user.image_file = user_update.image_file
+    user.save()
+    return UserResponse.from_mongo(user)
+
+
+@app.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: str):
+    oid = to_object_id(user_id)
+    user = get_user_or_404(oid)
+    user.delete()
+    
+
+
 @app.get("/api/posts", response_model=list[PostResponse])
 def get_posts():
     posts = models.Post.objects().select_related()
@@ -160,6 +182,31 @@ def get_post(post_id: str):
     post = get_post_or_404(oid)
     return PostResponse.from_mongo(post)
 
+
+@app.put("/api/posts/{post_id}", response_model=PostResponse)
+def update_post(post_id: str, post_update: PostUpdate):
+    oid = to_object_id(post_id)
+    post = get_post_or_404(oid)
+
+    # Compare both sides as strings to avoid ObjectId vs str mismatch
+    requesting_user_id = to_object_id(post_update.user_id)
+    if post.user.id != requesting_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the author of this post")
+
+    if post_update.title is not None:
+        post.title = post_update.title
+    if post_update.content is not None:
+        post.content = post_update.content
+
+    post.save()
+    return PostResponse.from_mongo(post)
+
+@app.delete("/api/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(post_id: str):
+    oid = to_object_id(post_id)
+    post = get_post_or_404(oid)
+    post.delete()
+    
 
 # ---------------------------------------------------------------------------
 # Exception handlers

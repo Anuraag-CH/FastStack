@@ -6,7 +6,8 @@ from mongoengine import (
     DateTimeField,
     Document,
     ReferenceField,
-    StringField,
+    StringField, 
+    CASCADE
 )
 
 
@@ -32,7 +33,7 @@ class Post(Document):
 
     title = StringField(max_length=100, required=True)
     content = StringField(required=True)
-    user = ReferenceField(User, required=True)
+    user = ReferenceField(User, required=True, reverse_delete_rule=CASCADE)
     date_posted = DateTimeField(default=lambda: datetime.now(UTC))
 
     @property

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from typing import Optional
 
 
 class UserBase(BaseModel):
@@ -29,6 +30,10 @@ class UserResponse(UserBase):
             image_path=user.image_path,
         )
 
+class UserUpdate(UserBase):
+    username: Optional[str] = Field(default=None, min_length=1, max_length=50)
+    email: Optional[EmailStr] = Field(default=None, max_length=120)
+    image_file: Optional[str] = Field(default=None, max_length=200)
 
 class PostBase(BaseModel):
     title: str = Field(min_length=1, max_length=100)
@@ -36,7 +41,13 @@ class PostBase(BaseModel):
 
 
 class PostCreate(PostBase):
-    user_id: str  # TEMPORARY — MongoDB ObjectId string
+    user_id: str  
+
+
+class PostUpdate(PostBase):
+    user_id: str
+    title: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    content: Optional[str] = Field(default=None, min_length=1)
 
 
 class PostResponse(PostBase):
