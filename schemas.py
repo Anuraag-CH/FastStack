@@ -30,10 +30,12 @@ class UserResponse(UserBase):
             image_path=user.image_path,
         )
 
+
 class UserUpdate(UserBase):
     username: Optional[str] = Field(default=None, min_length=1, max_length=50)
     email: Optional[EmailStr] = Field(default=None, max_length=120)
     image_file: Optional[str] = Field(default=None, max_length=200)
+
 
 class PostBase(BaseModel):
     title: str = Field(min_length=1, max_length=100)
@@ -41,7 +43,7 @@ class PostBase(BaseModel):
 
 
 class PostCreate(PostBase):
-    user_id: str  
+    user_id: str
 
 
 class PostUpdate(PostBase):

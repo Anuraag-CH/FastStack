@@ -31,12 +31,16 @@ app.include_router(posts.router)
 # HTML routes
 # ---------------------------------------------------------------------------
 
+
 @app.get("/", include_in_schema=False, name="home")
 @app.get("/posts", include_in_schema=False, name="posts")
 async def home(request: Request):
     import asyncio
+
     loop = asyncio.get_event_loop()
-    posts_qs = await loop.run_in_executor(None, lambda: models.Post.objects().select_related())
+    posts_qs = await loop.run_in_executor(
+        None, lambda: models.Post.objects().select_related()
+    )
     return templates.TemplateResponse(
         request,
         "home.html",
@@ -58,6 +62,7 @@ async def post_page(request: Request, post_id: str):
 @app.get("/users/{user_id}/posts", include_in_schema=False, name="user_posts")
 async def user_posts_page(request: Request, user_id: str):
     import asyncio
+
     oid = to_object_id(user_id)
     user = await get_user_or_404(oid)
     loop = asyncio.get_event_loop()
@@ -75,8 +80,11 @@ async def user_posts_page(request: Request, user_id: str):
 # Exception handlers
 # ---------------------------------------------------------------------------
 
+
 @app.exception_handler(StarletteHTTPException)
-async def general_http_exception_handler(request: Request, exception: StarletteHTTPException):
+async def general_http_exception_handler(
+    request: Request, exception: StarletteHTTPException
+):
     message = (
         exception.detail
         if exception.detail
@@ -100,7 +108,9 @@ async def general_http_exception_handler(request: Request, exception: StarletteH
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exception: RequestValidationError):
+async def validation_exception_handler(
+    request: Request, exception: RequestValidationError
+):
     if request.url.path.startswith("/api"):
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -120,4 +130,5 @@ async def validation_exception_handler(request: Request, exception: RequestValid
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

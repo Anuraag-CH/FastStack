@@ -12,7 +12,9 @@ router = APIRouter(prefix="/api/posts", tags=["posts"])
 @router.get("", response_model=list[PostResponse])
 async def get_posts():
     loop = asyncio.get_event_loop()
-    posts = await loop.run_in_executor(None, lambda: models.Post.objects().select_related())
+    posts = await loop.run_in_executor(
+        None, lambda: models.Post.objects().select_related()
+    )
     return [PostResponse.from_mongo(p) for p in posts]
 
 

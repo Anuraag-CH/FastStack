@@ -28,7 +28,9 @@ async def get_post_or_404(oid: ObjectId) -> models.Post:
 
     post = await loop.run_in_executor(None, _fetch)
     if post is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
     return post
 
 
@@ -43,5 +45,7 @@ async def get_user_or_404(oid: ObjectId) -> models.User:
 
     user = await loop.run_in_executor(None, _fetch)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
     return user

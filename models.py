@@ -2,13 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from mongoengine import (
-    DateTimeField,
-    Document,
-    ReferenceField,
-    StringField, 
-    CASCADE
-)
+from mongoengine import DateTimeField, Document, ReferenceField, StringField, CASCADE
 
 
 class User(Document):
@@ -39,4 +33,3 @@ class Post(Document):
     @property
     def author(self):
         return self.user
-
