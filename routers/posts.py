@@ -40,17 +40,10 @@ async def get_post(post_id: str):
     return PostResponse.from_mongo(post)
 
 
-@router.put("/{post_id}", response_model=PostResponse)
+@router.patch("/{post_id}", response_model=PostResponse)
 async def update_post(post_id: str, post_update: PostUpdate):
     oid = to_object_id(post_id)
     post = await get_post_or_404(oid)
-
-    requesting_user_id = to_object_id(post_update.user_id)
-    if post.user.id != requesting_user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not the author of this post",
-        )
 
     if post_update.title is not None:
         post.title = post_update.title

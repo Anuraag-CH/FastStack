@@ -10,6 +10,7 @@ class User(Document):
 
     username = StringField(max_length=50, unique=True, required=True)
     email = StringField(max_length=120, unique=True, required=True)
+    password = StringField(min_length=8, max_length=128, required=True)
     image_file = StringField(max_length=200, null=True, default=None)
 
     @property
