@@ -68,7 +68,7 @@ class PostBase(BaseModel):
 
 
 class PostCreate(PostBase):
-    user_id: str  # TEMPORARY - until authentication
+    pass
 
 
 class PostUpdate(BaseModel):
